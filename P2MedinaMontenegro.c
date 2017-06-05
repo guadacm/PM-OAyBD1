@@ -26,10 +26,10 @@
 
 typedef struct
 {
-    char Cod_socio[7];
-    char Cod_copia[7];
-    char P_fecha_prestamo[9];
-    char P_fecha_dev[9];
+    char Cod_socio[8];
+    char Cod_copia[8];
+    char P_fecha_prestamo[10];
+    char P_fecha_dev[10];
 } Prestamo;
 
 
@@ -39,7 +39,7 @@ int opcion = -1;
 Prestamo RAL[M]; //Definicion del Rebalse Abierto Lineal, de dimensión M.
 int cant_Prestamos = 0; // Cantidad de elementos almacenados en el RAL.
 
-char x_int[7];
+char x_int[8];
 int i_int;
 int hash; // Para almacenar el valor devuelto por la funcion hashing()
 int consultas;
@@ -123,6 +123,7 @@ void encabezado()
 
 void init()
 {
+    cant_Prestamos = 0;
     int i;
     for(i = 0; i < M; i++)      // Inicializo el RAL con la marca de celda virgen
         strcpy(RAL[i].Cod_socio, "*");
@@ -180,6 +181,7 @@ void Inicio(char cod_s[])
 {
     strcpy(x_int, cod_s);
     i_int = hashing(x_int);
+    consultas = 0;
     celda_libre = -1;
 }
 
@@ -191,11 +193,7 @@ int Hay_mas() // Devuelve 1 si encontro una tupla con el codigo buscado, sino de
         i_int = (i_int + 1) % M;
         consultas++;
     }
-    if(strcmp(RAL[i_int].Cod_socio, x_int) == 0)
-    {
-        celda_libre = i_int
-        return 1;
-    }
+    if(strcmp(RAL[i_int].Cod_socio, x_int) == 0) return 1;
     else
     {
         if(strcmp(RAL[i_int].Cod_socio, "*") == 0 && celda_libre == -1) {celda_libre = i_int;}
@@ -210,6 +208,7 @@ void Deme_otro() // Devuelve la tupla encontrada en la variale buscar
     strcpy(buscar.Cod_copia, RAL[i_int].Cod_copia);
     strcpy(buscar.P_fecha_prestamo, RAL[i_int].P_fecha_prestamo);
     strcpy(buscar.P_fecha_dev, RAL[i_int].P_fecha_dev);
+    i_int = (i_int + 1) % M;
 }
 
 int hashing (char codSoc[])
@@ -224,11 +223,11 @@ int hashing (char codSoc[])
 
 int alta(Prestamo nuevo)
 {
-    int h, pos;
+    //int h, pos;
     if(cant_Prestamos < M)
     {
         //if(localizar(nuevo.Cod_socio,nuevo.Cod_copia, &h, &pos) == 0)
-        if(localizar(nuevo.Cod_socio,nuevo.Cod_copia) == 0)
+        if(localizar(nuevo.Cod_socio, nuevo.Cod_copia) == 0)
         {
             //RAL[pos] = nuevo;
             RAL[celda_libre] = nuevo;
@@ -301,12 +300,12 @@ void memorizacion_previa()
     {
         while(!(feof(fp)))
         {
-            fscanf(fp," %[^\n]",nuevo.Cod_socio);
+            fscanf(fp," %[^\n]", nuevo.Cod_socio);
             strupr(nuevo.Cod_socio);
-            fscanf(fp," %[^\n]",nuevo.Cod_copia);
+            fscanf(fp," %[^\n]", nuevo.Cod_copia);
             strupr(nuevo.Cod_copia);
-            fscanf(fp," %[^\n]",nuevo.P_fecha_prestamo);
-            fscanf(fp," %[^\n]",nuevo.P_fecha_dev);
+            fscanf(fp," %[^\n]", nuevo.P_fecha_prestamo);
+            fscanf(fp," %[^\n]", nuevo.P_fecha_dev);
             alta(nuevo);
         }
         encabezado();
