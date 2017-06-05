@@ -60,6 +60,8 @@ int localizar(char codSoc[],char codCop[]);
 void Inicio(char cod_s[]);
 int Hay_mas();
 void Deme_otro();
+void guardar();
+void cargar();
 /* END PROTOTYPE */
 
 int main()
@@ -82,6 +84,8 @@ int main()
         switch (opcion)
         {
         case 0:
+            guardar();
+            system("pause");
             break;
 
         case 1:
@@ -96,8 +100,12 @@ int main()
                 encabezado();
                 printf("\n\t Estructura VACIA...\n\n");
             }
-
             else mostrar();
+            system("pause");
+            break;
+
+        case 6:
+            cargar();
             system("pause");
             break;
 
@@ -287,6 +295,24 @@ void mostrar()
             j = 0;
         }
     }
+}
+
+void guardar(){
+    FILE *fp;
+    if ((fp = fopen ( "prestamo.str", "w+" )) == NULL)
+        printf("\n\nERROR: no se pudo guardar el archivo\n\n");
+    fprintf(fp,"%d",cant_Prestamos);
+    fwrite(RAL,sizeof(Prestamo),11,fp);
+    fclose(fp);
+}
+void cargar(){
+    FILE *fp;
+    if ((fp = fopen ( "prestamo.str", "r+" )) == NULL)
+        printf("\n\nERROR: no se pudo leer el archivo\n\n");
+    fscanf(fp,"%d",&cant_Prestamos);
+    fread(RAL,sizeof(Prestamo),11,fp);
+    //printf("cant prestamos %d\n",cant_Prestamos);
+    fclose(fp);
 }
 
 void memorizacion_previa()
