@@ -21,8 +21,8 @@
 
 #define P 0.75  //Ro
 #define N 650
-//#define M 877   //M = N/P = 866.66. El Nº primo siguiente a M es 877
-#define M 11   // M=8/0.75= 10.66 -> M=11
+#define M 877   //M = N/P = 866.66. El Nº primo siguiente a M es 877
+//#define M 11   // M=8/0.75= 10.66 -> M=11
 
 typedef struct
 {
@@ -50,18 +50,19 @@ Prestamo buscar;
 /* PROTOTYPE */
 void encabezado();
 void init();
-int hashing (char[]);
-int alta(Prestamo);
-//int localizar(char[], char[], int*, int*);
-void mostrar();
-void memorizacion_previa();
-
 int localizar(char codSoc[],char codCop[]);
 void Inicio(char cod_s[]);
 int Hay_mas();
 void Deme_otro();
+int hashing (char codSoc[]);
+int alta(Prestamo nuevo);
+int baja(Prestamo baja);
+void evocacion_multiple(char codSoc[]);
+void mostrar_tupla(Prestamo prestamo);
+void mostrar();
 void guardar();
 void cargar();
+void memorizacion_previa();
 /* END PROTOTYPE */
 
 int main()
@@ -83,39 +84,86 @@ int main()
 
         switch (opcion)
         {
-        case 0:
-            guardar();
-            system("pause");
-            break;
-
-        case 1:
-            memorizacion_previa();
-            system("pause");
-            break;
-
-        case 5:
-            printf("\n[4] Mostrar Estructura\n");
-            if (cant_Prestamos == 0)
-            {
-                encabezado();
-                printf("\n\t Estructura VACIA...\n\n");
+            case 0: { // Salir
+                guardar();
+                system("pause");
+                break;
             }
-            else mostrar();
-            system("pause");
-            break;
-
-        case 6:
-            cargar();
-            system("pause");
-            break;
-
-            /*case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:*/
-
-
+            case 1: { // Memorizacion Previa
+                memorizacion_previa();
+                system("pause");
+                break;
+            }
+            case 2: { // Evocacion
+                encabezado();
+                if (cant_Prestamos != 0)
+                {
+                    char codigo[8];
+                    printf("\n Ingrese el Codigo de Socio que desea consultar: ");
+                    fflush(stdin);
+                    scanf("%s", codigo);
+                    strupr(codigo);
+                    evocacion_multiple(codigo);
+                }
+                else printf("\n Estructura vacia.\n\n");
+                system("pause");
+                break;
+            }
+            case 3: { // Alta
+                encabezado();
+                Prestamo nuevo;
+                printf("\n Nuevo Prestamo"       // Ingreso de datos del nuevo prestamo
+                       "\n\n Codigo de Socio: ");
+                fflush(stdin);
+                scanf(" %[^\n]", nuevo.Cod_socio);
+                strupr(nuevo.Cod_socio);
+                printf(" Codigo de Copia: ");
+                fflush(stdin);
+                scanf(" %[^\n]",nuevo.Cod_copia);
+                printf(" Fecha de Prestamo (DD/MM/AA): ");
+                fflush(stdin);
+                scanf(" %[^\n]",nuevo.P_fecha_prestamo);
+                printf(" Fecha de Devolucion (DD/MM/AA: ");
+                fflush(stdin);
+                scanf(" %[^\n]",nuevo.P_fecha_dev);
+                if(alta(nuevo) == 1) printf("\n El prestamo fue agregado con exito\n\n"); // Alta exitosa
+                else printf("\nError!!\n\n");          // Alta fracasa
+                system("pause");
+                break;
+            }
+            case 4: { // Baja
+                encabezado();
+                Prestamo borrar;
+                printf("\n Eliminar Prestamo"   // Ingreso datos del prestamo que quiero dar de baja
+                       "\n\n Codigo de Socio: ");
+                fflush(stdin);
+                scanf(" %[^\n]", borrar.Cod_socio);
+                strupr(borrar.Cod_socio);
+                printf(" Codigo de Copia: ");
+                fflush(stdin);
+                scanf(" %[^\n]", borrar.Cod_copia);
+                strupr(borrar.Cod_copia);
+                if(baja(borrar) == 1) printf("\nEl pretamo fue eliminado con exito\n\n"); // Baja exitosa
+                else printf("\nError!!\n\n"); // Baja no exitosa
+                system("pause");
+                break;
+            }
+            case 5: { // Mostrar Estructura
+                printf("\n Mostrar Estructura\n");
+                if (cant_Prestamos == 0)
+                {
+                    encabezado();
+                    printf("\n\t Estructura VACIA...\n\n");
+                }
+                else mostrar();
+                system("pause");
+                break;
+            }
+            case 6: { // Cargar
+                cargar();
+                system("pause");
+                break;
+            }
         }
     }
     return 0;
@@ -129,7 +177,7 @@ void encabezado()
            " **************************************************\n");
 }
 
-void init()
+void init() // Inicializa la estructura
 {
     cant_Prestamos = 0;
     int i;
@@ -137,43 +185,7 @@ void init()
         strcpy(RAL[i].Cod_socio, "*");
 }
 
-/*int localizar(char codSoc[],char codCop[],int *h, int *pos) // en h guardo el valor que me da la funcion hashing, en pos, la posicion donde debe/deberia estar el elemento que busco
-{
-    *h = hashing(codSoc);
-    *pos = *h;
-    if(cant_Prestamos > 0)
-    {
-        int i = *h;
-        int f = 0; // si esta en 1 me dice que ya guardo en pos una celda libre
-        while((strcmp(RAL[i].Cod_socio, codSoc)!= 0 || strcmp(RAL[i].Cod_copia, codCop)!= 0) && strcmp(RAL[i].Cod_socio, "*")!= 0)
-        {
-            if(strcmp(RAL[i].Cod_socio, "#") == 0 && f == 0)
-            {
-                *pos = i;
-                f = 1;
-            }
-            i = (i + 1) % M;
-        }
-        if(strcmp(RAL[i].Cod_socio, "*") == 0 && f == 0)
-            *pos = i;
-        if(strcmp(RAL[i].Cod_socio, codSoc)== 0 && strcmp(RAL[i].Cod_copia, codCop)== 0)
-        {
-            *pos = i;
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-
-    }
-    else
-    {
-        return 0;
-    }
-}*/
-
-int localizar(char codSoc[],char codCop[])
+int localizar(char codSoc[],char codCop[]) // Se usa para altas y bajas.
 {
     Inicio(codSoc);
     while (Hay_mas() != 0)
@@ -207,7 +219,6 @@ int Hay_mas() // Devuelve 1 si encontro una tupla con el codigo buscado, sino de
         if(strcmp(RAL[i_int].Cod_socio, "*") == 0 && celda_libre == -1) {celda_libre = i_int;}
         return 0;
     }
-    //if(consultas == M-1) {return 0;}    //CORRECCION
 }
 
 void Deme_otro() // Devuelve la tupla encontrada en la variale buscar
@@ -229,15 +240,12 @@ int hashing (char codSoc[])
     return((acumulador)% M );
 }
 
-int alta(Prestamo nuevo)
+int alta(Prestamo nuevo) //Da de alta en la estructura la tupla del parametro.
 {
-    //int h, pos;
     if(cant_Prestamos < M)
     {
-        //if(localizar(nuevo.Cod_socio,nuevo.Cod_copia, &h, &pos) == 0)
         if(localizar(nuevo.Cod_socio, nuevo.Cod_copia) == 0)
         {
-            //RAL[pos] = nuevo;
             RAL[celda_libre] = nuevo;
             cant_Prestamos++;
             return 1;
@@ -247,7 +255,43 @@ int alta(Prestamo nuevo)
     else return 0;
 }
 
-void mostrar_tupla(Prestamo prestamo)
+int baja(Prestamo baja) // Da de baja de la estructura la tupla del parametro
+{
+    if(localizar(baja.Cod_socio, baja.Cod_copia) == 1)
+        {
+            char c = 'N';
+
+            mostrar_tupla(buscar);
+            printf("\n Confirma que desea eliminar este prestamo? Y/N. ");
+            fflush(stdin);
+            scanf("%c", &c);
+            if (c == 'Y' || c == 'y')
+            {
+                strcpy(RAL[i_int-1].Cod_socio, "#"); // i_int -1 porque cuando en localizar() se llama a deme_otro el indice queda en la siguiente celda
+                cant_Prestamos--;
+                return 1;
+            }
+            else return 0;
+        }
+        else return 0;
+}
+
+void evocacion_multiple(char codSoc[]) // Muestra las tuplas que encuentra con el Codigo de Socio codSoc.
+{
+    int cant = 0;
+    Inicio(codSoc);
+    while (Hay_mas() != 0)
+    {
+        Deme_otro();
+        mostrar_tupla(buscar);
+        cant++;
+    }
+    if (cant == 0) printf("\n El Codigo de Socio %s no existe\n", codSoc);
+    else printf("\n Se encontraron %d coincidencias\n", cant);
+    printf("\n");
+}
+
+void mostrar_tupla(Prestamo prestamo) // Muestra por pantalla la tupla del parametro
 {
     printf("\n\t Codigo Socio: \t\t%s"
            "\n\t Codigo Copia: \t\t%s"
@@ -259,7 +303,7 @@ void mostrar_tupla(Prestamo prestamo)
            prestamo.P_fecha_dev);
 }
 
-void mostrar()
+void mostrar() // Muestra la estructura completa.
 {
     int i, j = 1;    // j es para limitar las celdas que se muestran
     encabezado();
@@ -297,25 +341,38 @@ void mostrar()
     }
 }
 
-void guardar(){
+void guardar() // Guarda la estructura en un archivo
+{
     FILE *fp;
+    encabezado();
     if ((fp = fopen ( "prestamo.str", "w+" )) == NULL)
         printf("\n\nERROR: no se pudo guardar el archivo\n\n");
-    fprintf(fp,"%d",cant_Prestamos);
-    fwrite(RAL,sizeof(Prestamo),11,fp);
-    fclose(fp);
-}
-void cargar(){
-    FILE *fp;
-    if ((fp = fopen ( "prestamo.str", "r+" )) == NULL)
-        printf("\n\nERROR: no se pudo leer el archivo\n\n");
-    fscanf(fp,"%d",&cant_Prestamos);
-    fread(RAL,sizeof(Prestamo),11,fp);
-    //printf("cant prestamos %d\n",cant_Prestamos);
+    else
+    {
+        fprintf(fp,"%d",cant_Prestamos);
+        fwrite(RAL,sizeof(Prestamo),877,fp);
+        printf("\n\n\t El archivo se guardo con exito\n\n");
+    }
     fclose(fp);
 }
 
-void memorizacion_previa()
+void cargar() // Carga los datos del archivo en la estructura
+{
+    FILE *fp;
+    encabezado();
+    if ((fp = fopen ( "prestamo.str", "r+" )) == NULL)
+        printf("\n\nERROR: no se pudo leer el archivo\n\n");
+    else
+    {
+        fscanf(fp,"%d",&cant_Prestamos);
+        fread(RAL,sizeof(Prestamo),877,fp);
+        printf("\n\n\t Carga de archivo exitosa\n\n");
+        //printf("cant prestamos %d\n",cant_Prestamos);
+    }
+    fclose(fp);
+}
+
+void memorizacion_previa() // Lee tuplas de un archivo y los da de alta en la estructura.
 {
     Prestamo nuevo;
     FILE *fp;
