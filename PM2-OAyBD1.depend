@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1496371886 source:c:\users\guada\desktop\sql\pm2-oaybd1\p2medinamontenegro.c
+1496668321 source:c:\users\guada\desktop\sql\pm2-oaybd1\p2medinamontenegro.c
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
 
