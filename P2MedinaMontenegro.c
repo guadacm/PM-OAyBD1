@@ -1,6 +1,7 @@
 /* ORGANIZACION DE ARCHIVOS y BASE DE DATOS I
     Práctico de máquina Nro 2 - Año 2017
 
+-- Grupo Nº 1
 -- Integrantes: MEDINA, Guadalupe
                 MONTENEGRO, Luis
 
@@ -21,8 +22,8 @@
 
 #define P 0.75  //Ro
 #define N 650
-//#define M 877   //M = N/P = 866.66. El Nº primo siguiente a M es 877
-#define M 11   // M=8/0.75= 10.66 -> M=11
+#define M 877   //M = N/P = 866.66. El Nº primo siguiente a M es 877
+//#define M 11   // M=8/0.75= 10.66 -> M=11
 
 typedef struct
 {
@@ -31,8 +32,6 @@ typedef struct
     char P_fecha_prestamo[10];
     char P_fecha_dev[10];
 } Prestamo;
-
-
 
 /* VARIABLES */
 int opcion = -1;
@@ -144,15 +143,6 @@ int main()
                     fflush(stdin);
                     scanf(" %[^\n]", borrar.Cod_copia);
                     strupr(borrar.Cod_copia);
-                    // Las siguientes lineas comentadas son para cuando en una baja hay que verificar todos los campos de la tupla.
-                    // En la funcion baja() se hace la comparacion de todos los campos de esta tupla con la encontrada en la estructura
-                    // con el mismo Cod_socio.(esas lines tambien aparecen comentadas).
-                    /*printf(" Fecha de Prestamo (DD/MM/AA): ");
-                    fflush(stdin);
-                    scanf(" %[^\n]",borrar.P_fecha_prestamo);
-                    printf(" Fecha de Devolucion (DD/MM/AA: ");
-                    fflush(stdin);
-                    scanf(" %[^\n]",borrar.P_fecha_dev);*/
                     if(baja(borrar) == 1) printf("\nEl pretamo fue eliminado con exito\n\n"); // Baja exitosa
                     else printf("\nError!!\n\n"); // Baja no exitosa
                 }
@@ -271,24 +261,19 @@ int baja(Prestamo borrar) // Da de baja de la estructura la tupla del parametro
 {
     if(localizar(borrar.Cod_socio, borrar.Cod_copia) == 1)
     {
-        // Las lineas comentadas son para cuando en la baja hay que verificar todos los campos de la tupla.
-        /*if (strcmp(borrar.P_fecha_prestamo, buscar.P_fecha_prestamo) == 0 && strcmp(borrar.P_fecha_dev, buscar.P_fecha_dev) == 0)
-        {*/
-            char c = 'N';
+        char c = 'N';
 
-            mostrar_tupla(buscar);
-            printf("\n Confirma que desea eliminar este prestamo? Y/N. ");
-            fflush(stdin);
-            scanf("%c", &c);
-            if (c == 'Y' || c == 'y')
-            {
-                strcpy(RAL[i_int-1].Cod_socio, "#"); // i_int -1 porque cuando en localizar() se llama a deme_otro el indice queda en la siguiente celda
-                cant_Prestamos--;
-                return 1;
-            }
-            else return 0;
-        /*}
-        else return 0;*/
+        mostrar_tupla(buscar);
+        printf("\n Confirma que desea eliminar este prestamo? Y/N. ");
+        fflush(stdin);
+        scanf("%c", &c);
+        if (c == 'Y' || c == 'y')
+        {
+            strcpy(RAL[i_int-1].Cod_socio, "#"); // i_int -1 porque cuando en localizar() se llama a deme_otro el indice queda en la siguiente celda
+            cant_Prestamos--;
+            return 1;
+        }
+        else return 0;
     }
     else return 0;
 }
