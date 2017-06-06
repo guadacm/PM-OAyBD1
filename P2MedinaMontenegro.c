@@ -21,8 +21,8 @@
 
 #define P 0.75  //Ro
 #define N 650
-#define M 877   //M = N/P = 866.66. El Nº primo siguiente a M es 877
-//#define M 11   // M=8/0.75= 10.66 -> M=11
+//#define M 877   //M = N/P = 866.66. El Nº primo siguiente a M es 877
+#define M 11   // M=8/0.75= 10.66 -> M=11
 
 typedef struct
 {
@@ -41,7 +41,6 @@ int cant_Prestamos = 0; // Cantidad de elementos almacenados en el RAL.
 
 char x_int[8];
 int i_int;
-int hash; // Para almacenar el valor devuelto por la funcion hashing()
 int consultas;
 int celda_libre;
 Prestamo buscar;
@@ -56,7 +55,7 @@ int Hay_mas();
 void Deme_otro();
 int hashing (char codSoc[]);
 int alta(Prestamo nuevo);
-int baja(Prestamo baja);
+int baja(Prestamo borrar);
 void evocacion_multiple(char codSoc[]);
 void mostrar_tupla(Prestamo prestamo);
 void mostrar();
@@ -105,7 +104,7 @@ int main()
                     strupr(codigo);
                     evocacion_multiple(codigo);
                 }
-                else printf("\n Estructura vacia.\n\n");
+                else printf("\n\t Estructura VACIA...\n\n");
                 system("pause");
                 break;
             }
@@ -133,18 +132,31 @@ int main()
             }
             case 4: { // Baja
                 encabezado();
-                Prestamo borrar;
-                printf("\n Eliminar Prestamo"   // Ingreso datos del prestamo que quiero dar de baja
-                       "\n\n Codigo de Socio: ");
-                fflush(stdin);
-                scanf(" %[^\n]", borrar.Cod_socio);
-                strupr(borrar.Cod_socio);
-                printf(" Codigo de Copia: ");
-                fflush(stdin);
-                scanf(" %[^\n]", borrar.Cod_copia);
-                strupr(borrar.Cod_copia);
-                if(baja(borrar) == 1) printf("\nEl pretamo fue eliminado con exito\n\n"); // Baja exitosa
-                else printf("\nError!!\n\n"); // Baja no exitosa
+                if (cant_Prestamos != 0)
+                {
+                    Prestamo borrar;
+                    printf("\n Eliminar Prestamo"   // Ingreso datos del prestamo que quiero dar de baja
+                           "\n\n Codigo de Socio: ");
+                    fflush(stdin);
+                    scanf(" %[^\n]", borrar.Cod_socio);
+                    strupr(borrar.Cod_socio);
+                    printf(" Codigo de Copia: ");
+                    fflush(stdin);
+                    scanf(" %[^\n]", borrar.Cod_copia);
+                    strupr(borrar.Cod_copia);
+                    // Las siguientes lineas comentadas son para cuando en una baja hay que verificar todos los campos de la tupla.
+                    // En la funcion baja() se hace la comparacion de todos los campos de esta tupla con la encontrada en la estructura
+                    // con el mismo Cod_socio.(esas lines tambien aparecen comentadas).
+                    /*printf(" Fecha de Prestamo (DD/MM/AA): ");
+                    fflush(stdin);
+                    scanf(" %[^\n]",borrar.P_fecha_prestamo);
+                    printf(" Fecha de Devolucion (DD/MM/AA: ");
+                    fflush(stdin);
+                    scanf(" %[^\n]",borrar.P_fecha_dev);*/
+                    if(baja(borrar) == 1) printf("\nEl pretamo fue eliminado con exito\n\n"); // Baja exitosa
+                    else printf("\nError!!\n\n"); // Baja no exitosa
+                }
+                else printf("\n\t Estructura VACIA...\n\n");
                 system("pause");
                 break;
             }
@@ -255,10 +267,13 @@ int alta(Prestamo nuevo) //Da de alta en la estructura la tupla del parametro.
     else return 0;
 }
 
-int baja(Prestamo baja) // Da de baja de la estructura la tupla del parametro
+int baja(Prestamo borrar) // Da de baja de la estructura la tupla del parametro
 {
-    if(localizar(baja.Cod_socio, baja.Cod_copia) == 1)
-        {
+    if(localizar(borrar.Cod_socio, borrar.Cod_copia) == 1)
+    {
+        // Las lineas comentadas son para cuando en la baja hay que verificar todos los campos de la tupla.
+        /*if (strcmp(borrar.P_fecha_prestamo, buscar.P_fecha_prestamo) == 0 && strcmp(borrar.P_fecha_dev, buscar.P_fecha_dev) == 0)
+        {*/
             char c = 'N';
 
             mostrar_tupla(buscar);
@@ -272,8 +287,10 @@ int baja(Prestamo baja) // Da de baja de la estructura la tupla del parametro
                 return 1;
             }
             else return 0;
-        }
-        else return 0;
+        /*}
+        else return 0;*/
+    }
+    else return 0;
 }
 
 void evocacion_multiple(char codSoc[]) // Muestra las tuplas que encuentra con el Codigo de Socio codSoc.
@@ -350,7 +367,7 @@ void guardar() // Guarda la estructura en un archivo
     else
     {
         fprintf(fp,"%d",cant_Prestamos);
-        fwrite(RAL,sizeof(Prestamo),877,fp);
+        fwrite(RAL,sizeof(Prestamo),M,fp);
         printf("\n\n\t El archivo se guardo con exito\n\n");
     }
     fclose(fp);
@@ -365,7 +382,7 @@ void cargar() // Carga los datos del archivo en la estructura
     else
     {
         fscanf(fp,"%d",&cant_Prestamos);
-        fread(RAL,sizeof(Prestamo),877,fp);
+        fread(RAL,sizeof(Prestamo),M,fp);
         printf("\n\n\t Carga de archivo exitosa\n\n");
         //printf("cant prestamos %d\n",cant_Prestamos);
     }
